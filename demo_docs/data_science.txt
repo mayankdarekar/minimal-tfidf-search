@@ -1,0 +1,1 @@
+Data science combines statistics, programming, and domain expertise to extract insights from data. Data scientists use tools like Python, R, and SQL. Visualization libraries like matplotlib and seaborn help communicate findings clearly.

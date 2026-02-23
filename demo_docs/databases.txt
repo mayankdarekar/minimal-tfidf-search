@@ -1,0 +1,1 @@
+A database is an organized collection of structured information or data. SQL databases use structured query language for managing relational data. NoSQL databases like MongoDB store unstructured or semi-structured data.

@@ -1,0 +1,1 @@
+Web development involves building websites and web applications. Frontend development uses HTML, CSS, and JavaScript. Backend development uses server-side languages like Python, Node.js, or Ruby. APIs connect frontend and backend systems.
