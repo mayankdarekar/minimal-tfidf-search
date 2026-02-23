@@ -1,6 +1,6 @@
 """
 Simple TF-IDF Search Engine
-============================
+
 Loads .txt documents from a folder, builds TF-IDF vectors,
 and returns the top 5 most relevant documents for a user query.
 
@@ -9,6 +9,11 @@ Usage:
 
     Or run interactively (it will prompt for a query):
     python search_engine.py --docs ./docs
+
+# Author: Mayank Darekar
+# Built as a learning project to understand TF-IDF, vector space model,
+# and cosine similarity for information retrieval.
+
 """
 
 import os
