@@ -1,8 +1,14 @@
 """
 Simple TF-IDF Search Engine
-
+============================
 Loads .txt documents from a folder, builds TF-IDF vectors,
 and returns the top 5 most relevant documents for a user query.
+
+Features:
+  - TF-IDF ranking with cosine similarity
+  - Search history saved to search_history.json
+  - Type 'history' during search to view past queries
+  - Type 'clear history' to wipe the history file
 
 Usage:
     python search_engine.py --docs ./docs --query "your search query"
@@ -10,20 +16,24 @@ Usage:
     Or run interactively (it will prompt for a query):
     python search_engine.py --docs ./docs
 
-# Author: Mayank Darekar
-# Built as a learning project to understand TF-IDF, vector space model,
-# and cosine similarity for information retrieval.
-
+    View saved history without searching:
+    python search_engine.py --show-history
 """
 
 import os
 import re
 import math
+import json
 import argparse
+from datetime import datetime
 from collections import defaultdict
 
-# 1. TEXT PREPROCESSING
 
+# ──────────────────────────────────────────────
+# 1. TEXT PREPROCESSING
+# ──────────────────────────────────────────────
+
+# Common words that carry little meaning (stop words)
 STOP_WORDS = {
     "a", "an", "the", "is", "it", "in", "on", "at", "to", "for",
     "of", "and", "or", "but", "not", "with", "this", "that", "are",
@@ -48,8 +58,9 @@ def preprocess(text: str) -> list[str]:
     return tokens
 
 
+# ──────────────────────────────────────────────
 # 2. LOAD DOCUMENTS
-
+# ──────────────────────────────────────────────
 
 def load_documents(folder: str) -> dict[str, str]:
     """
@@ -73,8 +84,9 @@ def load_documents(folder: str) -> dict[str, str]:
     return docs
 
 
+# ──────────────────────────────────────────────
 # 3. BUILD TF-IDF
-
+# ──────────────────────────────────────────────
 
 def compute_tf(tokens: list[str]) -> dict[str, float]:
     """
@@ -127,7 +139,9 @@ def compute_tfidf_vectors(
     return vectors
 
 
+# ──────────────────────────────────────────────
 # 4. COSINE SIMILARITY
+# ──────────────────────────────────────────────
 
 def cosine_similarity(vec_a: dict[str, float], vec_b: dict[str, float]) -> float:
     """
@@ -151,8 +165,9 @@ def cosine_similarity(vec_a: dict[str, float], vec_b: dict[str, float]) -> float
     return dot_product / (mag_a * mag_b)
 
 
-
+# ──────────────────────────────────────────────
 # 5. SEARCH
+# ──────────────────────────────────────────────
 
 def search(
     query: str,
@@ -186,7 +201,87 @@ def search(
     return [(fname, score) for fname, score in ranked if score > 0][:top_n]
 
 
-# 6. DISPLAY RESULTS
+# ──────────────────────────────────────────────
+# 6. SEARCH HISTORY
+# ──────────────────────────────────────────────
+
+# Where the history file lives (same directory as the script)
+HISTORY_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "search_history.json")
+
+
+def load_history() -> list[dict]:
+    """
+    Load search history from the JSON file.
+    Returns a list of history entries, or an empty list if none exist yet.
+    Each entry looks like:
+      { "query": "...", "timestamp": "2024-01-01 12:00:00", "result_count": 3 }
+    """
+    if not os.path.exists(HISTORY_FILE):
+        return []
+    try:
+        with open(HISTORY_FILE, "r", encoding="utf-8") as f:
+            return json.load(f)
+    except (json.JSONDecodeError, IOError):
+        # If the file is corrupted or unreadable, start fresh
+        return []
+
+
+def save_to_history(query: str, result_count: int) -> None:
+    """
+    Append a new search entry to the history file.
+    Creates the file if it doesn't exist yet.
+    """
+    history = load_history()
+
+    # Build the new entry
+    entry = {
+        "query": query,
+        "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        "result_count": result_count,
+    }
+    history.append(entry)
+
+    # Write the updated list back to the file
+    with open(HISTORY_FILE, "w", encoding="utf-8") as f:
+        json.dump(history, f, indent=2)
+
+
+def display_history(last_n: int = 10) -> None:
+    """
+    Print the most recent `last_n` search queries in a readable table.
+    """
+    history = load_history()
+
+    if not history:
+        print("\n  No search history yet.\n")
+        return
+
+    # Show only the last N entries
+    recent = history[-last_n:]
+
+    print(f"\n{'─'*55}")
+    print(f"  Search History  (showing last {len(recent)} of {len(history)} total)")
+    print(f"{'─'*55}")
+    print(f"  {'#':<4} {'Timestamp':<22} {'Results':<8} Query")
+    print(f"  {'─'*4} {'─'*20} {'─'*7} {'─'*20}")
+
+    for i, entry in enumerate(recent, start=1):
+        print(f"  {i:<4} {entry['timestamp']:<22} {entry['result_count']:<8} {entry['query']}")
+
+    print(f"{'─'*55}\n")
+    print(f"  History saved at: {HISTORY_FILE}\n")
+
+
+def clear_history() -> None:
+    """Delete all saved search history by overwriting the file with an empty list."""
+    with open(HISTORY_FILE, "w", encoding="utf-8") as f:
+        json.dump([], f)
+    print("  Search history cleared.\n")
+
+
+# ──────────────────────────────────────────────
+# 7. DISPLAY RESULTS
+# ──────────────────────────────────────────────
 
 def display_results(results: list[tuple[str, float]], docs: dict[str, str]) -> None:
     """Pretty-print ranked search results with a short document preview."""
@@ -206,8 +301,9 @@ def display_results(results: list[tuple[str, float]], docs: dict[str, str]) -> N
     print(f"\n{'─'*50}\n")
 
 
-
-# 7. DEMO DATA (auto-created if no folder given)
+# ──────────────────────────────────────────────
+# 8. DEMO DATA (auto-created if no folder given)
+# ──────────────────────────────────────────────
 
 def create_demo_docs(folder: str = "./demo_docs") -> str:
     """Create sample .txt files so you can try the engine right away."""
@@ -249,7 +345,9 @@ def create_demo_docs(folder: str = "./demo_docs") -> str:
     return folder
 
 
-# 8. MAIN
+# ──────────────────────────────────────────────
+# 9. MAIN
+# ──────────────────────────────────────────────
 
 def main():
     parser = argparse.ArgumentParser(description="Simple TF-IDF Search Engine")
@@ -257,7 +355,14 @@ def main():
                         help="Path to folder containing .txt documents")
     parser.add_argument("--query", type=str, default=None,
                         help="Search query (if omitted, interactive mode)")
+    parser.add_argument("--show-history", action="store_true",
+                        help="Print saved search history and exit")
     args = parser.parse_args()
+
+    # ── Show history and exit early if requested ──
+    if args.show_history:
+        display_history()
+        return
 
     # Use demo documents if no folder provided
     docs_folder = args.docs if args.docs else create_demo_docs()
@@ -275,18 +380,38 @@ def main():
     # Step 4: Build TF-IDF vector for each document
     doc_vectors = compute_tfidf_vectors(tokenized, idf)
 
-    print("Search engine ready! Type 'quit' to exit.\n")
+    print("Search engine ready!")
+    print("Commands: 'history' → view past searches | 'clear history' → wipe history | 'quit' → exit\n")
+
+    # ── Show recent history on startup so the user knows what they've searched ──
+    history = load_history()
+    if history:
+        print(f"  💡 You have {len(history)} past search(es). Type 'history' to view them.\n")
 
     # ── Query loop ────────────────────────────
     while True:
         query = args.query if args.query else input("Enter search query: ").strip()
 
+        # ── Special commands ──────────────────
         if query.lower() in ("quit", "exit", "q"):
             print("Goodbye!")
             break
 
+        if query.lower() == "history":
+            display_history()
+            continue
+
+        if query.lower() == "clear history":
+            clear_history()
+            continue
+
+        # ── Normal search ─────────────────────
         results = search(query, doc_vectors, idf, top_n=5)
         display_results(results, docs)
+
+        # Save this query to history (only if it produced tokens)
+        if preprocess(query):
+            save_to_history(query, result_count=len(results))
 
         # If query was passed as argument, don't loop
         if args.query:
