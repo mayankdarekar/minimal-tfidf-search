@@ -176,33 +176,35 @@ def clear_history():
 def create_demo_docs(folder="./demo_docs"):
     os.makedirs(folder, exist_ok=True)
     samples = {
-        "python.txt": (
-            "Python is a high-level programming language known for its simplicity "
-            "and readability. It is widely used in web development, data science, "
-            "machine learning, and automation. Python has a large standard library."
-        ),
         "machine_learning.txt": (
             "Machine learning is a branch of artificial intelligence that enables "
             "computers to learn from data without being explicitly programmed. "
             "Algorithms like decision trees, neural networks, and support vector "
             "machines are popular in machine learning."
         ),
-        "databases.txt": (
-            "A database is an organized collection of structured information or data. "
-            "SQL databases use structured query language for managing relational data. "
-            "NoSQL databases like MongoDB store unstructured or semi-structured data."
+        "space_exploration.txt": (
+            "Space exploration has led to some of the most significant scientific discoveries "
+            "in human history. NASA and SpaceX are pushing the boundaries of travel beyond "
+            "Earth's orbit. Mars missions, lunar bases, and reusable rockets are shaping "
+            "the future of how humans live and travel in space."
         ),
-        "web_development.txt": (
-            "Web development involves building websites and web applications. "
-            "Frontend development uses HTML, CSS, and JavaScript. Backend development "
-            "uses server-side languages like Python, Node.js, or Ruby. APIs connect "
-            "frontend and backend systems."
+        "street_food.txt": (
+            "Street food culture is one of the most authentic ways to experience a city. "
+            "From tacos in Mexico City to ramen stalls in Tokyo, street vendors have perfected "
+            "recipes passed down through generations. The best meals are often found in the "
+            "smallest stalls down the narrowest alleys."
         ),
-        "data_science.txt": (
-            "Data science combines statistics, programming, and domain expertise to "
-            "extract insights from data. Data scientists use tools like Python, R, "
-            "and SQL. Visualization libraries like matplotlib and seaborn help "
-            "communicate findings clearly."
+        "skateboarding.txt": (
+            "Skateboarding originated in California in the 1950s and has grown into a global "
+            "sport and lifestyle. Tricks like the ollie, kickflip, and grind are fundamental "
+            "to street skating. The culture is deeply tied to music, art, and fashion and "
+            "became an Olympic sport in 2021."
+        ),
+        "true_crime.txt": (
+            "True crime has become one of the most popular podcast and documentary genres. "
+            "Listeners are drawn to the psychology behind criminal behavior and the stories "
+            "of investigators who crack cold cases. Shows like Serial and Making a Murderer "
+            "sparked mainstream interest in unsolved mysteries and wrongful convictions."
         ),
     }
     for fname, content in samples.items():
