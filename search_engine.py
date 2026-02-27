@@ -190,7 +190,7 @@ def create_demo_docs(folder="./demo_docs"):
         ),
         "space_exploration.txt": (
             "Space exploration has always been driven by curiosity and the need to understand where we come from. "
-            "The Apollo missions in the late 1960s were a turning point — humans actually walked on another world. "
+            "The Apollo missions in the late 1960s were a turning point - humans actually walked on another world. "
             "Since then, robotic missions have done a lot of the heavy lifting. Rovers like Curiosity and Perseverance "
             "have been crawling across Mars, analyzing soil, searching for signs of ancient microbial life. "
             "SpaceX changed the game by making rocket boosters reusable, dramatically cutting the cost of getting "
