@@ -161,7 +161,7 @@ def display_history(last_n=10):
     print(f"\n  Search History (last {len(recent)} of {len(history)})")
     print(f"  {'#':<4} {'Timestamp':<22} {'Results':<8} Query")
     for i, entry in enumerate(recent, start=1):
-        print(f"  {i:<4} {entry['timestamp']:<22} {entry['result_count']:<8} {entry['query']}")
+        print(f"  {i:<4} {entry['timestamp']:<22} {entry.get('result_count', '-'):<8} {entry['query']}")
     print()
 
 
@@ -190,7 +190,7 @@ def create_demo_docs(folder="./demo_docs"):
         ),
         "space_exploration.txt": (
             "Space exploration has always been driven by curiosity and the need to understand where we come from. "
-            "The Apollo missions in the late 1960s were a turning point - humans actually walked on another world. "
+            "The Apollo missions in the late 1960s were a turning point — humans actually walked on another world. "
             "Since then, robotic missions have done a lot of the heavy lifting. Rovers like Curiosity and Perseverance "
             "have been crawling across Mars, analyzing soil, searching for signs of ancient microbial life. "
             "SpaceX changed the game by making rocket boosters reusable, dramatically cutting the cost of getting "
@@ -264,6 +264,7 @@ def main():
     parser.add_argument("--docs", type=str, default=None)
     parser.add_argument("--query", type=str, default=None)
     parser.add_argument("--show-history", action="store_true")
+    parser.add_argument("--top", type=int, default=5)
     args = parser.parse_args()
 
     if args.show_history:
@@ -295,7 +296,7 @@ def main():
             clear_history()
             continue
 
-        results = search(query, doc_vectors, idf, top_n=5)
+        results = search(query, doc_vectors, idf, top_n=args.top)
         display_results(results, docs, query=query, idf=idf)
 
         if preprocess(query):
