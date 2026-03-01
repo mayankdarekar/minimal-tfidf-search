@@ -79,7 +79,7 @@ def cosine_similarity(vec_a, vec_b):
     return dot / (mag_a * mag_b)
 
 
-def search(query, doc_vectors, idf, top_n=5):
+def search(query, doc_vectors, idf, top_n=5, min_score=0.1):
     tokens = preprocess(query)
     if not tokens:
         print("Query is empty after preprocessing.")
@@ -90,7 +90,7 @@ def search(query, doc_vectors, idf, top_n=5):
 
     scores = {fname: cosine_similarity(query_vec, dvec) for fname, dvec in doc_vectors.items()}
     ranked = sorted(scores.items(), key=lambda x: x[1], reverse=True)
-    return [(fname, score) for fname, score in ranked if score > 0][:top_n]
+    return [(fname, score) for fname, score in ranked if score >= min_score][:top_n]
 
 
 def suggest(query, idf):
@@ -265,6 +265,7 @@ def main():
     parser.add_argument("--query", type=str, default=None)
     parser.add_argument("--show-history", action="store_true")
     parser.add_argument("--top", type=int, default=5)
+    parser.add_argument("--min-score", type=float, default=0.1)
     args = parser.parse_args()
 
     if args.show_history:
@@ -296,7 +297,7 @@ def main():
             clear_history()
             continue
 
-        results = search(query, doc_vectors, idf, top_n=args.top)
+        results = search(query, doc_vectors, idf, top_n=args.top, min_score=args.min_score)
         display_results(results, docs, query=query, idf=idf)
 
         if preprocess(query):
